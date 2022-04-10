@@ -1,0 +1,6 @@
+<resources>
+
+    <style name="Theme.AnimeVostTV" parent="@style/Theme.AppCompat.NoActionBar" >
+        <item name="colorAccent">#ffb84d</item>
+    </style>
+</resources>
