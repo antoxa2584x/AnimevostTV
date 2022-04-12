@@ -73,10 +73,10 @@ fun Context.loadOngoings(page: Int, dataReadyListener: (MutableList<PreviewTitle
     downloadThread.start()
 }
 
-fun Context.loadDetails(link: String, dataReadyListener: (DetailsTitleModel?) -> Unit) {
+fun Context.loadDetails(detailsLink: String, dataReadyListener: (DetailsTitleModel?) -> Unit) {
     val downloadThread: Thread = object : Thread() {
         override fun run() {
-            val doc = Jsoup.connect(link).get()
+            val doc = Jsoup.connect(detailsLink).get()
                 .getElementById("dle-content")
             val titles = doc?.getElementsByClass("shortstory")
 
@@ -84,39 +84,38 @@ fun Context.loadDetails(link: String, dataReadyListener: (DetailsTitleModel?) ->
 
             if (titles != null) {
                 val content = titles.select("table > tbody > tr > td > p")
-                titleModels = DetailsTitleModel(
-                    title = titles.select("div.shortstoryHead > h1").text() ?: "",
+                titleModels = DetailsTitleModel().apply {
+                    title = titles.select("div.shortstoryHead > h1").text() ?: ""
                     link = titles.select("div.shortstoryHead > h1").firstOrNull()?.attr("href")
-                        ?: "",
+                        ?: ""
                     image = "https://animevost.org/" + doc.getElementsByClass("imgRadius")
-                        .attr("src"),
+                        .attr("src")
                     description = content.firstOrNull {
                         it.toString().contains("<strong>Описание: </strong>")
-                    }?.text()?.replace("Описание: ", ""),
+                    }?.text()?.replace("Описание ", "")
                     year = content.firstOrNull {
                         it.toString().contains("<strong>Год выхода: </strong>")
-                    }?.text()?.replace("Год выхода: ", "")?.toIntOrNull(),
+                    }?.text()?.replace("Год выхода ", "")?.toIntOrNull()
                     type = content.firstOrNull {
                         it.toString().contains("<strong>Тип: </strong>")
-                    }?.text()?.replace("Тип: ", ""),
+                    }?.text()?.replace("Тип ", "")
                     genre = content.firstOrNull {
                         it.toString().contains("<strong>Жанр: </strong>")
-                    }?.text()?.replace("Жанр: ", ""),
+                    }?.text()?.replace("Жанр ", "")
                     episodesCount = content.firstOrNull {
                         it.toString().contains("<strong>Количество серий: </strong>")
-                    }?.text()?.replace("Количество серий: ", ""),
-                    rate = titles.select("current-rating").text().toIntOrNull(),
+                    }?.text()?.replace("Количество серий ", "")
+                    rate = titles.select("current-rating").text().toIntOrNull()
                     director = content.firstOrNull {
                         it.toString().contains("<strong>Режиссёр: </strong>")
-                    }?.text()?.replace("Режиссёр: ", ""),
+                    }?.text()?.replace("Режиссёр ", "")
                     directorLink = (content.firstOrNull {
                         it.toString().contains("<strong>Режиссёр: </strong>")
-                    }?.childNode(1) as Element?)?.attr("href"),
-                    simpleDetails = titles.select("div.shortstoryContent > table > tbody > tr > td > p")
-                        .joinToString(separator = "<br>") { it.html() },
-                    screensList = doc.getElementsByClass("skrin").select("a")
-                        .map { "https://animevost.org/" + it.attr("href") }
-                )
+                    }?.childNode(1) as Element?)?.attr("href")
+                    simpleDetails =
+                        titles.select("div.shortstoryContent > table > tbody > tr > td > p")
+                            .joinToString(separator = "<br>") { it.html() }
+                }
             }
 
             Log.i("", titleModels.toString())
@@ -131,15 +130,13 @@ fun Context.loadDetails(link: String, dataReadyListener: (DetailsTitleModel?) ->
     downloadThread.start()
 }
 
-fun Context.loadPlayList(link: String, onPlaylistReady: (List<PlaylistModel>) -> Unit) {
+fun Context.loadPlayList(id: String, onPlaylistReady: (List<PlaylistModel>) -> Unit) {
     val downloadThread: Thread = object : Thread() {
         override fun run() {
-            val titleId = link.substringAfterLast("/").substringBefore("-")
-
             val client = OkHttpClient()
 
             val formBody = FormBody.Builder()
-                .add("id", titleId)
+                .add("id", id)
                 .build()
             val request: Request = Request.Builder()
                 .url("https://api.animevost.org/v1/playlist")

@@ -70,9 +70,13 @@ abstract class TrackSelectionAdapter<VH> :
         }
     }
 
-    abstract class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    abstract class ViewHolder(itemView: View, animate: Boolean) :
+        RecyclerView.ViewHolder(itemView) {
         init {
             itemView.setOnFocusChangeListener { v, hasFocus ->
+                if (!animate)
+                    return@setOnFocusChangeListener
+
                 if (hasFocus) {
                     // run scale animation and make it bigger
                     val anim: Animation =

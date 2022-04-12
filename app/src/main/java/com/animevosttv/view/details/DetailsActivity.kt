@@ -1,5 +1,6 @@
 package com.animevosttv.view.details
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -12,8 +13,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.animevosttv.R
 import com.animevosttv.core.dataLoader.loadDetails
 import com.animevosttv.core.dataLoader.loadPlayList
+import com.animevosttv.core.model.LatestWatchedTitleEpisode
 import com.animevosttv.core.model.PlaylistModel
 import com.animevosttv.core.model.PreviewTitleModel
+import com.animevosttv.core.prefs.ApplicationPreferences
 import com.animevosttv.view.adapter.PlayListAdapter
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.activity_details.*
@@ -32,6 +35,9 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
         }
     }
 
+    private lateinit var previewModel: PreviewTitleModel
+    private var lastWatched: LatestWatchedTitleEpisode? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
@@ -39,13 +45,22 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
         progress_bar.visibility = View.VISIBLE
 
         (intent.extras?.get(TITLE) as PreviewTitleModel?)?.let { preview ->
+            this.previewModel = preview
+            lastWatched =
+                ApplicationPreferences.watchedTitles.firstOrNull { it.titleId == previewModel.getId() }
+
             animeTitle.text = preview.title
 
             Glide.with(this).load(preview.image).into(this@DetailsActivity.preview)
 
-            loadPlayList(preview.link ?: "") {
-                playlist.adapter = PlayListAdapter(this@DetailsActivity, it).apply {
+            loadPlayList(preview.getId()) {
+                playlist.adapter = PlayListAdapter(this@DetailsActivity, it, preview.getId()).apply {
                     setClickListener(this@DetailsActivity)
+                }
+
+                lastWatched?.let {
+                    if (it.episode > 1)
+                        playlist.layoutManager?.scrollToPosition(it.episode - 1)
                 }
             }
             loadDetails(preview.link ?: "") { details ->
@@ -68,7 +83,31 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onItemClick(view: View?, previewTitleModel: PlaylistModel) {
+        if (ApplicationPreferences.watchedList.none { it == previewTitleModel.hd }) {
+            ApplicationPreferences.watchedList.add(previewModel.getId() + previewTitleModel.name)
+            (playlist.adapter as PlayListAdapter).notifyDataSetChanged()
+        }
+
+        if (lastWatched != null) {
+            if (lastWatched!!.episode < previewTitleModel.name.replace(Regex("\\D+"), "").toInt()) {
+                ApplicationPreferences.watchedTitles.remove(lastWatched)
+
+                lastWatched = LatestWatchedTitleEpisode(
+                    previewModel.getId(),
+                    previewTitleModel.name.replace(Regex("\\D+"), "").toInt()
+                )
+                ApplicationPreferences.watchedTitles.add(lastWatched!!)
+            }
+        } else {
+            lastWatched = LatestWatchedTitleEpisode(
+                previewModel.getId(),
+                previewTitleModel.name.replace(Regex("\\D+"), "").toInt()
+            )
+            ApplicationPreferences.watchedTitles.add(lastWatched!!)
+        }
+
         val intent = Intent(Intent.ACTION_VIEW)
         val videoUri = Uri.parse(previewTitleModel.hd)
         intent.setDataAndType(videoUri, "application/x-mpegURL")

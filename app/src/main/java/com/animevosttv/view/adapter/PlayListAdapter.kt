@@ -6,10 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import com.animevosttv.R
 import com.animevosttv.core.model.PlaylistModel
+import com.animevosttv.core.prefs.ApplicationPreferences
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.playlist_title_preview.view.*
 
-class PlayListAdapter internal constructor(context: Context?, data: List<PlaylistModel>) :
+class PlayListAdapter internal constructor(
+    context: Context?,
+    data: List<PlaylistModel>,
+    private val titleId: String
+) :
     TrackSelectionAdapter<PlayListAdapter.ViewHolder>() {
     private val mData: List<PlaylistModel> = data
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
@@ -24,13 +29,16 @@ class PlayListAdapter internal constructor(context: Context?, data: List<Playlis
         val data = mData[position]
         with(viewHolder.itemView) {
             Glide.with(this).load(data.preview).into(preview)
-            title.text = data.name
+
+            if (ApplicationPreferences.watchedList.any { it == (titleId + data.name) }) {
+                title.text = "Просмотрено\n${data.name}"
+            } else {
+                title.text = data.name
+            }
         }
     }
 
-    override fun getItemCount(): Int {
-        return mData.size
-    }
+    override fun getItemCount() = mData.size
 
     fun setClickListener(itemClickListener: ItemClickListener?) {
         mClickListener = itemClickListener
@@ -41,7 +49,7 @@ class PlayListAdapter internal constructor(context: Context?, data: List<Playlis
     }
 
     inner class ViewHolder internal constructor(itemView: View) :
-        TrackSelectionAdapter.ViewHolder(itemView) {
+        TrackSelectionAdapter.ViewHolder(itemView, true) {
 
         init {
             itemView.setOnClickListener {

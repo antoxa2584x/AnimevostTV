@@ -15,4 +15,6 @@ data class PlaylistModel(
     val preview: String,
     @SerializedName("std")
     val std: String
-) : Parcelable
+) : Parcelable{
+    fun getHttpsPreview() = preview.replace("http","https")
+}

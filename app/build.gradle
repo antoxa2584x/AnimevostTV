@@ -39,4 +39,9 @@ dependencies {
     implementation 'com.henryblue.library:tvrecyclerview:1.2.4'
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation 'com.google.code.gson:gson:2.9.0'
+
+    //Preference
+    implementation 'com.chibatching.kotpref:kotpref:2.13.1'
+    implementation 'com.chibatching.kotpref:initializer:2.13.1'
+    implementation 'com.chibatching.kotpref:gson-support:2.13.1'
 }

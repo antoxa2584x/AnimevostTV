@@ -4,16 +4,19 @@ import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
-data class PreviewTitleModel(
-    val title: String = "",
-    val image: String? = "",
-    val description: String? = "",
-    val year: Int? = 0,
-    val genre: String? = "",
-    val episodesCount: String? = "",
-    val type: String? = "",
-    val rate: Int? = 0,
-    val link: String? = "",
-    val director: String? = "",
-    val directorLink: String? = ""
-):Parcelable
+open class PreviewTitleModel(
+    var title: String = "",
+    var image: String? = "",
+    var description: String? = "",
+    var year: Int? = 0,
+    var genre: String? = "",
+    var episodesCount: String? = "",
+    var type: String? = "",
+    var rate: Int? = 0,
+    var link: String? = "",
+    var director: String? = "",
+    var directorLink: String? = ""
+):Parcelable{
+
+    fun getId() = link?.substringAfterLast("/")?.substringBefore("-")?:""
+}

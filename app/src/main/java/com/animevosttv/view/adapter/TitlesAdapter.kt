@@ -27,7 +27,7 @@ class TitlesAdapter internal constructor(context: Context?, data: MutableList<Pr
             else -> View(parent.context)
         }
 
-        return ViewHolder(view)
+        return ViewHolder(view, viewType != 0)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -68,8 +68,8 @@ class TitlesAdapter internal constructor(context: Context?, data: MutableList<Pr
         fun onItemClick(view: View?, previewTitleModel: PreviewTitleModel)
     }
 
-    inner class ViewHolder internal constructor(itemView: View) :
-        TrackSelectionAdapter.ViewHolder(itemView) {
+    inner class ViewHolder internal constructor(itemView: View, animate: Boolean) :
+        TrackSelectionAdapter.ViewHolder(itemView, animate) {
 
         init {
             itemView.setOnClickListener {
