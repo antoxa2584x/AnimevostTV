@@ -30,7 +30,7 @@ class PlayListAdapter internal constructor(
         with(viewHolder.itemView) {
             Glide.with(this).load(data.preview).into(preview)
 
-            if (ApplicationPreferences.watchedList.any { it == (titleId + data.name) }) {
+            if (ApplicationPreferences.watchedList.any { it == data.hd }) {
                 title.text = "Просмотрено\n${data.name}"
             } else {
                 title.text = data.name

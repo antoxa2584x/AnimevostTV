@@ -86,27 +86,37 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
     @SuppressLint("NotifyDataSetChanged")
     override fun onItemClick(view: View?, previewTitleModel: PlaylistModel) {
         if (ApplicationPreferences.watchedList.none { it == previewTitleModel.hd }) {
-            ApplicationPreferences.watchedList.add(previewModel.getId() + previewTitleModel.name)
+            val watchedList = ApplicationPreferences.watchedList
+            watchedList.add(previewTitleModel.hd)
+            ApplicationPreferences.watchedList = watchedList
+
             (playlist.adapter as PlayListAdapter).notifyDataSetChanged()
         }
 
-        if (lastWatched != null) {
-            if (lastWatched!!.episode < previewTitleModel.name.replace(Regex("\\D+"), "").toInt()) {
-                ApplicationPreferences.watchedTitles.remove(lastWatched)
+        val episode = previewTitleModel.name.replace(Regex("\\D+"), "").toInt()
 
-                lastWatched = LatestWatchedTitleEpisode(
-                    previewModel.getId(),
-                    previewTitleModel.name.replace(Regex("\\D+"), "").toInt()
+        val watchedTitles = ApplicationPreferences.watchedTitles
+
+        lastWatched?.let {
+            if (it.episode < episode) {
+                watchedTitles.remove(it)
+                watchedTitles.add(
+                    LatestWatchedTitleEpisode(
+                        previewModel.getId(),
+                        episode
+                    )
                 )
-                ApplicationPreferences.watchedTitles.add(lastWatched!!)
             }
-        } else {
-            lastWatched = LatestWatchedTitleEpisode(
-                previewModel.getId(),
-                previewTitleModel.name.replace(Regex("\\D+"), "").toInt()
+        } ?: kotlin.run {
+            watchedTitles.add(
+                LatestWatchedTitleEpisode(
+                    previewModel.getId(),
+                    episode
+                )
             )
-            ApplicationPreferences.watchedTitles.add(lastWatched!!)
         }
+
+        ApplicationPreferences.watchedTitles = watchedTitles
 
         val intent = Intent(Intent.ACTION_VIEW)
         val videoUri = Uri.parse(previewTitleModel.hd)
