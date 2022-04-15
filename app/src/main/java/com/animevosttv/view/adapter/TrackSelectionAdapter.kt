@@ -84,6 +84,7 @@ abstract class TrackSelectionAdapter<VH> :
                     itemView.startAnimation(anim)
                     anim.fillAfter = true
                     onFocus()
+                    itemView.elevation = 10f
                 } else {
                     // run scale animation and make it smaller
                     val anim: Animation =
@@ -91,6 +92,8 @@ abstract class TrackSelectionAdapter<VH> :
                     itemView.startAnimation(anim)
                     anim.fillAfter = true
                     onUnFocus()
+                    itemView.elevation = 0f
+
                 }
             }
 

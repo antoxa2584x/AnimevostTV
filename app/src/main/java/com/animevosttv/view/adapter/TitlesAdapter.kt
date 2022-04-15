@@ -9,7 +9,11 @@ import com.animevosttv.R
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.default_title_item.view.*
 
-class TitlesAdapter internal constructor(context: Context?, data: MutableList<PreviewTitleModel>) :
+class TitlesAdapter internal constructor(
+    context: Context?,
+    data: MutableList<PreviewTitleModel>,
+    val showHeader: Boolean = true
+) :
     TrackSelectionAdapter<TitlesAdapter.ViewHolder>() {
     private val mData: MutableList<PreviewTitleModel> = data
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
@@ -31,6 +35,9 @@ class TitlesAdapter internal constructor(context: Context?, data: MutableList<Pr
     }
 
     override fun getItemViewType(position: Int): Int {
+        if (!showHeader)
+            return CONTENT
+
         return when (position) {
             0 -> HEADER
             else -> CONTENT
@@ -38,20 +45,22 @@ class TitlesAdapter internal constructor(context: Context?, data: MutableList<Pr
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        if (position == HEADER)
+        if (showHeader && position == HEADER)
             return
 
-        val data = mData[position - 1]
+        val data = mData[position - if (showHeader) 1 else 0]
         with(viewHolder.itemView) {
             Glide.with(this).load(data.image).into(preview)
             animeTitle.text = data.title
             rating.rating = (((data.rate?.toFloat() ?: 0f) / 100.0) * 5).toFloat()
             genre.text = data.genre
+
+            rating.visibility = if (data.rate == null) View.GONE else View.VISIBLE
         }
     }
 
     override fun getItemCount(): Int {
-        return mData.size + 1
+        return mData.size + if (showHeader) 1 else 0
     }
 
     fun setClickListener(itemClickListener: ItemClickListener?) {
@@ -61,7 +70,12 @@ class TitlesAdapter internal constructor(context: Context?, data: MutableList<Pr
     fun addAll(list: MutableList<PreviewTitleModel>) {
         val inititalSzie = mData.size
         mData.addAll(list)
-        notifyItemRangeInserted(inititalSzie + 1, list.size)
+        notifyItemRangeInserted(inititalSzie + if (showHeader) 1 else 0, list.size)
+    }
+
+    fun clear() {
+        mData.clear()
+        notifyDataSetChanged()
     }
 
     interface ItemClickListener {
@@ -73,21 +87,29 @@ class TitlesAdapter internal constructor(context: Context?, data: MutableList<Pr
 
         init {
             itemView.setOnClickListener {
-                if (adapterPosition != 0)
-                    mClickListener?.onItemClick(it, mData[adapterPosition - 1])
+                if (showHeader) {
+                    if (adapterPosition != 0)
+                        mClickListener?.onItemClick(it, mData[adapterPosition - 1])
+                } else {
+                    mClickListener?.onItemClick(it, mData[adapterPosition])
+                }
             }
         }
 
         override fun onFocus() {
             super.onFocus()
             itemView.genre?.visibility = View.VISIBLE
-            itemView.rating?.visibility = View.VISIBLE
+
+            if (itemView.rating.rating != 0f)
+                itemView.rating?.visibility = View.VISIBLE
         }
 
         override fun onUnFocus() {
             super.onUnFocus()
             itemView.genre?.visibility = View.GONE
-            itemView.rating?.visibility = View.GONE
+
+            if (itemView.rating.rating != 0f)
+                itemView.rating?.visibility = View.GONE
         }
     }
 }

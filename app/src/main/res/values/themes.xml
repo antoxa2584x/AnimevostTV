@@ -3,4 +3,8 @@
     <style name="Theme.AnimeVostTV" parent="@style/Theme.AppCompat.NoActionBar" >
         <item name="colorAccent">#ffb84d</item>
     </style>
+    <style name="ThemeOverlay.SearchView" parent="Theme.AnimeVostTV">
+        <item name="android:editTextColor">#000</item>
+        <item name="android:textColorHint">#000</item>
+    </style>
 </resources>

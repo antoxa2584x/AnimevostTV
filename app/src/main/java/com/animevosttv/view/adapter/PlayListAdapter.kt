@@ -28,7 +28,7 @@ class PlayListAdapter internal constructor(
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val data = mData[position]
         with(viewHolder.itemView) {
-            Glide.with(this).load(data.preview).into(preview)
+            Glide.with(this).load(data.getHttpsPreview()).into(preview)
 
             if (ApplicationPreferences.watchedList.any { it == data.hd }) {
                 title.text = "Просмотрено\n${data.name}"

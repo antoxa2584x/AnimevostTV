@@ -8,18 +8,22 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.view.View
+import android.widget.RatingBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.recyclerview.widget.RecyclerView
 import com.animevosttv.R
 import com.animevosttv.core.dataLoader.loadDetails
 import com.animevosttv.core.dataLoader.loadPlayList
+import com.animevosttv.core.helper.isGoogleTV
 import com.animevosttv.core.model.LatestWatchedTitleEpisode
 import com.animevosttv.core.model.PlaylistModel
 import com.animevosttv.core.model.PreviewTitleModel
 import com.animevosttv.core.prefs.ApplicationPreferences
 import com.animevosttv.view.adapter.PlayListAdapter
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.activity_details.*
 
 class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
     companion object {
@@ -38,46 +42,84 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
     private lateinit var previewModel: PreviewTitleModel
     private var lastWatched: LatestWatchedTitleEpisode? = null
 
+    private lateinit var title: AppCompatTextView
+    private lateinit var progressBar: View
+    private lateinit var episodesList: RecyclerView
+    private lateinit var titlePreview: AppCompatImageView
+    private lateinit var infoTextView: AppCompatTextView
+    private lateinit var aboutTextView: AppCompatTextView
+    private lateinit var ratingBar: RatingBar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_details)
 
-        progress_bar.visibility = View.VISIBLE
+        setContentView(if (isGoogleTV()) R.layout.activity_details else R.layout.activity_details_mobile)
+
+        if (isGoogleTV().not()) {
+            findViewById<View>(R.id.back).setOnClickListener {
+                onBackPressed()
+            }
+        }
+
+        title = findViewById(R.id.animeTitle)
+        progressBar = findViewById(R.id.progress_bar)
+        episodesList = findViewById(R.id.playlist)
+        titlePreview = findViewById(R.id.preview)
+        infoTextView = findViewById(R.id.info)
+        aboutTextView = findViewById(R.id.details)
+        ratingBar = findViewById(R.id.rating)
+
+        progressBar.visibility = View.VISIBLE
 
         (intent.extras?.get(TITLE) as PreviewTitleModel?)?.let { preview ->
             this.previewModel = preview
             lastWatched =
                 ApplicationPreferences.watchedTitles.firstOrNull { it.titleId == previewModel.getId() }
 
-            animeTitle.text = preview.title
+            title.text = preview.title
 
-            Glide.with(this).load(preview.image).into(this@DetailsActivity.preview)
+            Glide.with(this).load(preview.image).into(titlePreview)
 
             loadPlayList(preview.getId()) {
-                playlist.adapter = PlayListAdapter(this@DetailsActivity, it, preview.getId()).apply {
-                    setClickListener(this@DetailsActivity)
-                }
+                episodesList.adapter =
+                    PlayListAdapter(this@DetailsActivity, it, preview.getId()).apply {
+                        setClickListener(this@DetailsActivity)
+                    }
 
                 lastWatched?.let {
                     if (it.episode > 1)
-                        playlist.layoutManager?.scrollToPosition(it.episode - 1)
+                        episodesList.layoutManager?.scrollToPosition(it.episode - 1)
                 }
             }
             loadDetails(preview.link ?: "") { details ->
                 details?.let {
-                    animeTitle.text = it.title
+                    title.text = it.title
 
-                    Glide.with(this).load(it.image).into(this@DetailsActivity.preview)
+                    Glide.with(this).load(it.image).into(titlePreview)
 
-                    info.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Html.fromHtml(it.simpleDetails, Html.FROM_HTML_MODE_LEGACY)
-                    } else {
-                        Html.fromHtml(it.simpleDetails)
+                    var info = it.simpleDetails?.substringBefore("Описание")
+                    if (isGoogleTV().not()) {
+                        info = "<b>Эпизоды:</b> [" + it.title.substringAfter("[") +"<br><br>"+ info
                     }
 
-                    rating.rating = (((preview.rate?.toFloat() ?: 0f) / 100.0) * 5).toFloat()
+                    val detailsText = "Описание" + it.simpleDetails?.substringAfter("Описание")
 
-                    progress_bar.visibility = View.GONE
+                    infoTextView.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Html.fromHtml(info, Html.FROM_HTML_MODE_LEGACY)
+                    } else {
+                        Html.fromHtml(info)
+                    }
+
+
+                    aboutTextView.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        Html.fromHtml(detailsText, Html.FROM_HTML_MODE_LEGACY)
+                    } else {
+                        Html.fromHtml(detailsText)
+                    }
+
+                    ratingBar.rating = (((details.rate?.toFloat() ?: 0f) / 100.0) * 5).toFloat()
+
+                    progressBar.visibility = View.GONE
                 }
             }
         }
@@ -90,7 +132,7 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
             watchedList.add(previewTitleModel.hd)
             ApplicationPreferences.watchedList = watchedList
 
-            (playlist.adapter as PlayListAdapter).notifyDataSetChanged()
+            (episodesList.adapter as PlayListAdapter).notifyDataSetChanged()
         }
 
         val episode = previewTitleModel.name.replace(Regex("\\D+"), "").toInt()
@@ -123,7 +165,7 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
         intent.setDataAndType(videoUri, "application/x-mpegURL")
         intent.putExtra(
             "title",
-            animeTitle.text.toString().substringBefore("[") + "\n" + previewTitleModel.name
+            title.text.toString().substringBefore("[") + "\n" + previewTitleModel.name
         )
 
         try {
