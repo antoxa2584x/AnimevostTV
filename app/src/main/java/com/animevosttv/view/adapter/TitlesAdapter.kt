@@ -6,11 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.animevosttv.R
+import com.animevosttv.view.details.OngoingFragment
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.default_title_item.view.*
 
 class TitlesAdapter internal constructor(
-    context: Context?,
+    context: Context,
     data: MutableList<PreviewTitleModel>,
     val showHeader: Boolean = true
 ) :
@@ -52,10 +53,6 @@ class TitlesAdapter internal constructor(
         with(viewHolder.itemView) {
             Glide.with(this).load(data.image).into(preview)
             animeTitle.text = data.title
-            rating.rating = (((data.rate?.toFloat() ?: 0f) / 100.0) * 5).toFloat()
-            genre.text = data.genre
-
-            rating.visibility = if (data.rate == null) View.GONE else View.VISIBLE
         }
     }
 
@@ -98,18 +95,10 @@ class TitlesAdapter internal constructor(
 
         override fun onFocus() {
             super.onFocus()
-            itemView.genre?.visibility = View.VISIBLE
-
-            if (itemView.rating.rating != 0f)
-                itemView.rating?.visibility = View.VISIBLE
         }
 
         override fun onUnFocus() {
             super.onUnFocus()
-            itemView.genre?.visibility = View.GONE
-
-            if (itemView.rating.rating != 0f)
-                itemView.rating?.visibility = View.GONE
         }
     }
 }

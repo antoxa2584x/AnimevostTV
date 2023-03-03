@@ -1,10 +1,21 @@
 <resources>
 
-    <style name="Theme.AnimeVostTV" parent="@style/Theme.AppCompat.NoActionBar" >
-        <item name="colorAccent">#ffb84d</item>
+    <style name="Theme.AnimeVostTV" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="materialDrawerStyle">@style/Widget.MaterialDrawerStyle</item>
+        <item name="materialDrawerHeaderStyle">@style/Widget.MaterialDrawerHeaderStyle</item>
+        <item name="colorAccent">#EC5354</item>
+        <item name="backgroundColor">#131722</item>
+        <item name="android:windowBackground">#131722</item>
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
     </style>
+
     <style name="ThemeOverlay.SearchView" parent="Theme.AnimeVostTV">
         <item name="android:editTextColor">#000</item>
         <item name="android:textColorHint">#000</item>
+    </style>
+
+    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+        <item name="spinBars">true</item>
+        <item name="color">@android:color/white</item>
     </style>
 </resources>

@@ -5,18 +5,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.animevosttv.R
+import com.animevosttv.core.model.EpisodeModel
 import com.animevosttv.core.model.PlaylistModel
 import com.animevosttv.core.prefs.ApplicationPreferences
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.bumptech.glide.request.RequestOptions.bitmapTransform
+import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.playlist_title_preview.view.*
 
 class PlayListAdapter internal constructor(
     context: Context?,
-    data: List<PlaylistModel>,
-    private val titleId: String
+    data: List<EpisodeModel>,
+    private val previewLink: String?,
+    private val titleId: String?
 ) :
     TrackSelectionAdapter<PlayListAdapter.ViewHolder>() {
-    private val mData: List<PlaylistModel> = data
+    private val mData: List<EpisodeModel> = data
     private val mInflater: LayoutInflater = LayoutInflater.from(context)
     private var mClickListener: ItemClickListener? = null
 
@@ -28,12 +33,13 @@ class PlayListAdapter internal constructor(
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val data = mData[position]
         with(viewHolder.itemView) {
-            Glide.with(this).load(data.getHttpsPreview()).into(preview)
+            Glide.with(this).load(previewLink)
+                .apply(bitmapTransform(BlurTransformation(25, 3))).into(preview)
 
-            if (ApplicationPreferences.watchedList.any { it == data.hd }) {
-                title.text = "Просмотрено\n${data.name}"
+            if (ApplicationPreferences.watchedList.any { it == data.id }) {
+                title.text = "Подивився\n${data.episode}"
             } else {
-                title.text = data.name
+                title.text = data.episode
             }
         }
     }
@@ -45,7 +51,7 @@ class PlayListAdapter internal constructor(
     }
 
     interface ItemClickListener {
-        fun onItemClick(view: View?, previewTitleModel: PlaylistModel)
+        fun onItemClick(view: View?, previewTitleModel: EpisodeModel)
     }
 
     inner class ViewHolder internal constructor(itemView: View) :

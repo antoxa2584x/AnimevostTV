@@ -1,45 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.ongoings.OngoingsActivity">
+    android:fitsSystemWindows="true">
 
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/search_badge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:contentDescription="Search"
-        android:nextFocusLeft="@id/content"
-        android:src="@drawable/lb_ic_in_app_search"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/content"
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:clipToPadding="false"
-        android:focusedByDefault="true"
-        android:nextFocusRight="@id/search_badge"
-        android:paddingTop="32dp"
-        android:paddingBottom="64dp" />
+        android:background="#131722"
+        tools:context=".view.ongoings.OngoingsActivity">
 
-    <FrameLayout
-        android:id="@+id/progress_bar_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/background_color_opaque">
-
-        <ProgressBar
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/search_badge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center" />
-    </FrameLayout>
-</androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_margin="24dp"
+            android:backgroundTint="#EC5354"
+            android:contentDescription="Пошук"
+            android:nextFocusLeft="@id/content"
+            android:src="@drawable/lb_ic_in_app_search"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:visibility="visible" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name="com.animevosttv.view.details.OngoingFragment" />
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:background="#EC5354"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_menu_open"
+            app:titleTextColor="#fff" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.mikepenz.materialdrawer.widget.MaterialDrawerSliderView
+        android:id="@+id/slider"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:materialDrawerBackground="#131722" />
+</androidx.drawerlayout.widget.DrawerLayout>

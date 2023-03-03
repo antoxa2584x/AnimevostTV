@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#131722"
     android:clipToPadding="false"
     android:paddingBottom="24dp">
 
@@ -18,6 +19,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -27,55 +29,72 @@
                 android:layout_height="wrap_content"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
-                android:padding="8dp"
                 android:focusable="true"
+                android:padding="8dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
 
             <androidx.appcompat.widget.AppCompatTextView
+                android:textColor="#fff"
                 android:id="@+id/animeTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:textSize="24sp"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/back"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/back"
                 app:layout_constraintTop_toTopOf="parent"
-                android:maxLines="2"
-                android:ellipsize="end"
                 tools:text="@tools:sample/lorem/random" />
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/preview"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_marginTop="16dp"
-                android:scaleType="centerCrop"
-                app:layout_constrainedHeight="true"
-                app:layout_constraintDimensionRatio="H,3:2"
-                app:layout_constraintHeight="240dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/animeTitle"
-                tools:src="@tools:sample/avatars" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/info"
-                android:layout_width="0dp"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/info_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/preview"
-                app:layout_constraintTop_toTopOf="@id/preview"
-                tools:text="@tools:sample/lorem/random" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/animeTitle">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/preview"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:scaleType="centerCrop"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constraintDimensionRatio="H,3:2"
+                    app:layout_constraintHeight="240dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:src="@tools:sample/avatars" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/info"
+                    android:textColor="#fff"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:ellipsize="end"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/preview"
+                    app:layout_constraintTop_toTopOf="@id/preview"
+                    tools:maxLines="10"
+                    tools:text="@tools:sample/lorem/random" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/details"
                 android:layout_width="0dp"
+                android:textColor="#5d616d"
                 android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/info_layout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/rating"
+                tools:maxLines="10"
                 tools:text="@tools:sample/lorem/random" />
 
             <ProgressBar
@@ -84,25 +103,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/preview"
+                app:layout_constraintBottom_toBottomOf="@id/info_layout"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/preview"
-                app:layout_constraintTop_toTopOf="@id/preview" />
+                app:layout_constraintStart_toEndOf="@id/info_layout"
+                app:layout_constraintTop_toTopOf="@id/info_layout" />
 
-            <androidx.appcompat.widget.AppCompatRatingBar
-                android:id="@+id/rating"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="8dp"
-                android:isIndicator="true"
-                android:numStars="5"
-                android:scaleX="0.6"
-                android:scaleY="0.6"
-                app:layout_constraintEnd_toEndOf="@id/preview"
-                app:layout_constraintStart_toStartOf="@id/preview"
-                app:layout_constraintTop_toBottomOf="@id/preview"
-                tools:visibility="visible" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView

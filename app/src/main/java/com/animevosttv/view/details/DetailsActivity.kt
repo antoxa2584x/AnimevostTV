@@ -13,13 +13,14 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.animevosttv.R
 import com.animevosttv.core.dataLoader.loadDetails
-import com.animevosttv.core.dataLoader.loadPlayList
+import com.animevosttv.core.dataLoader.loadFile
 import com.animevosttv.core.helper.isGoogleTV
+import com.animevosttv.core.model.EpisodeModel
 import com.animevosttv.core.model.LatestWatchedTitleEpisode
-import com.animevosttv.core.model.PlaylistModel
 import com.animevosttv.core.model.PreviewTitleModel
 import com.animevosttv.core.prefs.ApplicationPreferences
 import com.animevosttv.view.adapter.PlayListAdapter
@@ -30,7 +31,7 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
         const val TITLE = "title_model"
 
         fun getIntent(
-            callActivity: AppCompatActivity,
+            callActivity: FragmentActivity,
             previewTitleModel: PreviewTitleModel
         ): Intent {
             val myIntent = Intent(callActivity, DetailsActivity::class.java)
@@ -67,7 +68,6 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
         titlePreview = findViewById(R.id.preview)
         infoTextView = findViewById(R.id.info)
         aboutTextView = findViewById(R.id.details)
-        ratingBar = findViewById(R.id.rating)
 
         progressBar.visibility = View.VISIBLE
 
@@ -80,29 +80,24 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
 
             Glide.with(this).load(preview.image).into(titlePreview)
 
-            loadPlayList(preview.getId()) {
-                episodesList.adapter =
-                    PlayListAdapter(this@DetailsActivity, it, preview.getId()).apply {
-                        setClickListener(this@DetailsActivity)
-                    }
-
-                lastWatched?.let {
-                    if (it.episode > 1)
-                        episodesList.layoutManager?.scrollToPosition(it.episode - 1)
-                }
-            }
+//            loadPlayList(preview.getId()) {
+//                episodesList.adapter =
+//                    PlayListAdapter(this@DetailsActivity, it, preview.getId()).apply {
+//                        setClickListener(this@DetailsActivity)
+//                    }
+//
+//                lastWatched?.let {
+//                    if (it.episode > 1)
+//                        episodesList.layoutManager?.scrollToPosition(it.episode - 1)
+//                }
+//            }
             loadDetails(preview.link ?: "") { details ->
                 details?.let {
                     title.text = it.title
 
                     Glide.with(this).load(it.image).into(titlePreview)
 
-                    var info = it.simpleDetails?.substringBefore("Описание")
-                    if (isGoogleTV().not()) {
-                        info = "<b>Эпизоды:</b> [" + it.title.substringAfter("[") +"<br><br>"+ info
-                    }
-
-                    val detailsText = "Описание" + it.simpleDetails?.substringAfter("Описание")
+                    val info = it.additionalInfo
 
                     infoTextView.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         Html.fromHtml(info, Html.FROM_HTML_MODE_LEGACY)
@@ -110,81 +105,68 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
                         Html.fromHtml(info)
                     }
 
-
                     aboutTextView.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        Html.fromHtml(detailsText, Html.FROM_HTML_MODE_LEGACY)
+                        Html.fromHtml(it.description, Html.FROM_HTML_MODE_LEGACY)
                     } else {
-                        Html.fromHtml(detailsText)
+                        Html.fromHtml(it.description)
                     }
 
-                    ratingBar.rating = (((details.rate?.toFloat() ?: 0f) / 100.0) * 5).toFloat()
-
                     progressBar.visibility = View.GONE
+
+                    episodesList.adapter =
+                        it.playList?.firstOrNull()?.episodes?.let { season ->
+                            PlayListAdapter(this@DetailsActivity, season, preview.image, preview.getId()).apply {
+                                setClickListener(this@DetailsActivity)
+                            }
+                        }
+
                 }
             }
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onItemClick(view: View?, previewTitleModel: PlaylistModel) {
-        if (ApplicationPreferences.watchedList.none { it == previewTitleModel.hd }) {
+    override fun onItemClick(view: View?, previewTitleModel: EpisodeModel) {
+        if (ApplicationPreferences.watchedList.none { it == previewTitleModel.id }) {
             val watchedList = ApplicationPreferences.watchedList
-            watchedList.add(previewTitleModel.hd)
+            previewTitleModel.id?.let { watchedList.add(it) }
             ApplicationPreferences.watchedList = watchedList
-
             (episodesList.adapter as PlayListAdapter).notifyDataSetChanged()
         }
 
-        val episode = previewTitleModel.name.replace(Regex("\\D+"), "").toInt()
+        loadFile(previewTitleModel.link){
 
-        val watchedTitles = ApplicationPreferences.watchedTitles
-
-        lastWatched?.let {
-            if (it.episode < episode) {
-                watchedTitles.remove(it)
-                watchedTitles.add(
-                    LatestWatchedTitleEpisode(
-                        previewModel.getId(),
-                        episode
-                    )
-                )
+            if(it?.contains("Файл не найден") == true){
+                Toast.makeText(this, "Файл не знайдено", Toast.LENGTH_SHORT).show()
+                return@loadFile
             }
-        } ?: kotlin.run {
-            watchedTitles.add(
-                LatestWatchedTitleEpisode(
-                    previewModel.getId(),
-                    episode
-                )
+
+            val intent = Intent(Intent.ACTION_VIEW)
+            val videoUri = Uri.parse(it)
+            intent.setDataAndType(videoUri, "application/x-mpegURL")
+            intent.putExtra(
+                "title",
+                title.text.toString()
             )
-        }
 
-        ApplicationPreferences.watchedTitles = watchedTitles
-
-        val intent = Intent(Intent.ACTION_VIEW)
-        val videoUri = Uri.parse(previewTitleModel.hd)
-        intent.setDataAndType(videoUri, "application/x-mpegURL")
-        intent.putExtra(
-            "title",
-            title.text.toString().substringBefore("[") + "\n" + previewTitleModel.name
-        )
-
-        try {
-            intent.setPackage("com.mxtech.videoplayer.pro")
-            startActivity(intent);
-        } catch (e: ActivityNotFoundException) {
             try {
-                intent.setPackage("com.mxtech.videoplayer.ad")
+                intent.setPackage("com.mxtech.videoplayer.pro")
                 startActivity(intent);
             } catch (e: ActivityNotFoundException) {
-                val goToMarket =
-                    Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://search?q='MX Player'"))
-                startActivity(goToMarket)
+                try {
+                    intent.setPackage("com.mxtech.videoplayer.ad")
+                    startActivity(intent);
+                } catch (e: ActivityNotFoundException) {
+                    val goToMarket =
+                        Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://search?q='MX Player'"))
+                    startActivity(goToMarket)
 
-                Toast.makeText(
-                    this,
-                    "Для корректной работы необходим MX Player",
-                    Toast.LENGTH_SHORT
-                ).show()
+                    Toast.makeText(
+                        this,
+                        "Для корректной работы необходим MX Player",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }

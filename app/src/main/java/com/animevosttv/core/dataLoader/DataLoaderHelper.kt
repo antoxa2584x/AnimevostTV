@@ -2,24 +2,34 @@ package com.animevosttv.core.dataLoader
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.animevosttv.core.model.DetailsTitleModel
-import com.animevosttv.core.model.PlaylistModel
-import com.animevosttv.core.model.PreviewTitleModel
+import com.animevosttv.core.model.*
 import com.google.gson.Gson
-import okhttp3.FormBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
-import java.io.IOException
+import java.io.BufferedInputStream
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 
-fun Context.loadOngoings(page: Int, dataReadyListener: (MutableList<PreviewTitleModel>) -> Unit) {
+fun Context.loadOngoings(
+    page: Int,
+    base: String,
+    dataReadyListener: (MutableList<PreviewTitleModel>) -> Unit
+) {
     val downloadThread: Thread = object : Thread() {
         override fun run() {
-            val doc = Jsoup.connect("https://animevost.org/ongoing/page/${page}/").get()
-                .getElementById("dle-content")
+            val doc = try {
+                Jsoup.connect("https://cikava-ideya.top/${base}/page/${page}/").get()
+                    .getElementById("dle-content")
+            } catch (e: java.lang.Exception) {
+                null
+            }
 
             (this@loadOngoings as AppCompatActivity).runOnUiThread {
                 dataReadyListener(parseData(doc))
@@ -38,9 +48,10 @@ fun Context.searchTitles(
 ) {
     val downloadThread: Thread = object : Thread() {
         override fun run() {
-            val doc = Jsoup.connect("https://animevost.org/index.php?do=search&subaction=search&search_start=$page&full_search=0&result_from=${page * 9}&story=$search")
-                .get()
-                .getElementById("dle-content")
+            val doc =
+                Jsoup.connect("https://cikava-ideya.top/index.php?do=search&subaction=search&search_start=0&full_search=0&result_from=1&story=$search")
+                    .get()
+                    .getElementById("dle-content")
 
             (this@searchTitles as AppCompatActivity).runOnUiThread {
                 dataReadyListener(parseData(doc))
@@ -53,40 +64,17 @@ fun Context.searchTitles(
 }
 
 private fun parseData(doc: Element?): MutableList<PreviewTitleModel> {
-    val titles = doc?.getElementsByClass("shortstory")
+    val titles = doc?.getElementsByClass("th-item")
 
     val titleModels = mutableListOf<PreviewTitleModel>()
     if (titles != null) {
         for (item: Element in titles) {
-            val content = item.select("table > tbody > tr > td > p")
             titleModels.add(
                 PreviewTitleModel(
-                    title = item.select("a").firstOrNull()?.text() ?: "",
-                    link = item.select("a").firstOrNull()?.attr("href") ?: "",
-                    image = "https://animevost.org/" + item.getElementsByClass("imgRadius")
-                        .attr("src"),
-                    description = content.firstOrNull {
-                        it.toString().contains("<strong>Описание: </strong>")
-                    }?.text()?.replace("Описание: ", ""),
-                    year = content.firstOrNull {
-                        it.toString().contains("<strong>Год выхода: </strong>")
-                    }?.text()?.replace("Год выхода: ", "")?.toIntOrNull(),
-                    type = content.firstOrNull {
-                        it.toString().contains("<strong>Тип: </strong>")
-                    }?.text()?.replace("Тип: ", ""),
-                    genre = content.firstOrNull {
-                        it.toString().contains("<strong>Жанр: </strong>")
-                    }?.text()?.replace("Жанр: ", ""),
-                    episodesCount = content.firstOrNull {
-                        it.toString().contains("<strong>Количество серий: </strong>")
-                    }?.text()?.replace("Количество серий: ", ""),
-                    rate = item.getElementsByClass("current-rating").text().toIntOrNull(),
-                    director = content.firstOrNull {
-                        it.toString().contains("<strong>Режиссёр: </strong>")
-                    }?.text()?.replace("Режиссёр: ", ""),
-                    directorLink = (content.firstOrNull {
-                        it.toString().contains("<strong>Режиссёр: </strong>")
-                    }?.childNode(1) as Element?)?.attr("href")
+                    title = item.getElementsByClass("th-title nowrap").firstOrNull()?.text() ?: "",
+                    link = item.getElementsByClass("th-in").firstOrNull()?.attr("href") ?: "",
+                    image = "https://cikava-ideya.top/" + item.getElementsByClass("th-img")
+                        .firstOrNull()?.getElementsByClass("anim")?.firstOrNull()?.attr("src"),
                 )
             )
         }
@@ -100,48 +88,109 @@ private fun parseData(doc: Element?): MutableList<PreviewTitleModel> {
 fun Context.loadDetails(detailsLink: String, dataReadyListener: (DetailsTitleModel?) -> Unit) {
     val downloadThread: Thread = object : Thread() {
         override fun run() {
-            val doc = Jsoup.connect(detailsLink).get()
-                .getElementById("dle-content")
-            val titles = doc?.getElementsByClass("shortstory")
+            val form = URL(detailsLink)
+            val connection1 = form.openConnection() as HttpURLConnection
+            connection1.readTimeout = 10000
+            val whole = StringBuilder()
+            val reader = BufferedReader(
+                InputStreamReader(BufferedInputStream(connection1.inputStream))
+            )
+            var inputLine: String?
+            while (reader.readLine().also { inputLine = it } != null) whole.append(inputLine)
+            reader.close()
+            val doc = Jsoup.parse(whole.toString())
+            val titles = doc.getElementById("dle-content")?.getElementsByClass("shortstory")
 
             var titleModels: DetailsTitleModel? = null
 
             if (titles != null) {
-                val content = titles.select("table > tbody > tr > td > p")
                 titleModels = DetailsTitleModel().apply {
-                    title = titles.select("div.shortstoryHead > h1").text() ?: ""
-                    link = titles.select("div.shortstoryHead > h1").firstOrNull()?.attr("href")
+                    title = doc.getElementsByClass("fright fx-1").select("h1").firstOrNull()?.text()
                         ?: ""
-                    image = "https://animevost.org/" + doc.getElementsByClass("imgRadius")
-                        .attr("src")
-                    description = content.firstOrNull {
-                        it.toString().contains("<strong>Описание: </strong>")
-                    }?.text()?.replace("Описание ", "")
-                    year = content.firstOrNull {
-                        it.toString().contains("<strong>Год выхода: </strong>")
-                    }?.text()?.replace("Год выхода ", "")?.toIntOrNull()
-                    type = content.firstOrNull {
-                        it.toString().contains("<strong>Тип: </strong>")
-                    }?.text()?.replace("Тип ", "")
-                    genre = content.firstOrNull {
-                        it.toString().contains("<strong>Жанр: </strong>")
-                    }?.text()?.replace("Жанр ", "")
-                    episodesCount = content.firstOrNull {
-                        it.toString().contains("<strong>Количество серий: </strong>")
-                    }?.text()?.replace("Количество серий ", "")
-                    rate = doc.getElementsByClass("current-rating").text().toIntOrNull()
-                    director = content.firstOrNull {
-                        it.toString().contains("<strong>Режиссёр: </strong>")
-                    }?.text()?.replace("Режиссёр ", "")
-                    directorLink = (content.firstOrNull {
-                        it.toString().contains("<strong>Режиссёр: </strong>")
-                    }?.childNode(1) as Element?)?.attr("href")
-                    simpleDetails =
-                        titles.select("div.shortstoryContent > table > tbody > tr > td > p")
-                            .joinToString(separator = "<br>") { it.html() }
+                    image =
+                        "https://cikava-ideya.top/" + doc.getElementsByClass("fposter img-box img-fit")
+                            .firstOrNull()?.getElementsByClass("anim")?.firstOrNull()?.attr("src")
+                    description = doc.getElementsByClass("fdesc clr full-text clearfix").html()
+                    additionalInfo =
+                        doc.getElementsByClass("flist").firstOrNull()?.html()?.replace("<li>", "")
+                            ?.replace("</li>", "<br>")
+                    playList = run {
+                        val playlistJson =
+                            doc.getElementsByClass("fplayer tabs-box").firstOrNull()?.children()
+                                ?.last()?.html()?.substringAfter("return ")
+                                ?.substringBefore("; \t}")
+
+                        val playlist =
+                            Gson().fromJson(playlistJson, JsonObject::class.java).get("Player1")
+
+                        if (playlist.isJsonPrimitive) {
+                            return@run listOf(
+                                SeasonModel(
+                                    "0", listOf(
+                                        EpisodeModel(
+                                            "Фільм", playlist.asString, "", "${
+                                                detailsLink.substringAfter("top/")
+                                                    .substringBefore("-")
+                                            }"
+                                        )
+                                    )
+                                )
+                            )
+                        }
+
+                        if (!playlist.toString().contains("сезон")) {
+                            val empMapType =
+                                object : TypeToken<Map<String, String>>() {}.type
+                            val episodes =
+                                Gson().fromJson<Map<String, String>>(
+                                    playlist,
+                                    empMapType
+                                )
+
+                            listOf(
+                                SeasonModel(
+                                    "0",
+                                    episodes.map { episode ->
+                                        EpisodeModel(
+                                            episode.key,
+                                            episode.value,
+                                            "",
+                                            "${
+                                                detailsLink.substringAfter("top/")
+                                                    .substringBefore("-")
+                                            }${episode.key.filter { it.isDigit() }}"
+                                        )
+                                    })
+                            )
+                        } else {
+                            val empMapType =
+                                object : TypeToken<Map<String, Map<String, String>>>() {}.type
+                            val seasonModel =
+                                Gson().fromJson<Map<String, Map<String, String>>>(
+                                    playlist,
+                                    empMapType
+                                )
+
+                            seasonModel.map { season ->
+                                SeasonModel(
+                                    season.key,
+                                    season.value.map { episode ->
+                                        EpisodeModel(
+                                            episode.key,
+                                            episode.value,
+                                            "",
+                                            "${
+                                                detailsLink.substringAfter("top/")
+                                                    .substringBefore("-")
+                                            }${season.key.filter { it.isDigit() }}${episode.key.filter { it.isDigit() }}"
+                                        )
+                                    })
+                            }
+                        }
+                    }
                 }
             }
-
+//
             Log.i("", titleModels.toString())
 
             (this@loadDetails as AppCompatActivity).runOnUiThread {
@@ -154,31 +203,17 @@ fun Context.loadDetails(detailsLink: String, dataReadyListener: (DetailsTitleMod
     downloadThread.start()
 }
 
-fun Context.loadPlayList(id: String, onPlaylistReady: (List<PlaylistModel>) -> Unit) {
+
+fun Context.loadFile(detailsLink: String, dataReadyListener: (String?) -> Unit) {
     val downloadThread: Thread = object : Thread() {
         override fun run() {
-            val client = OkHttpClient()
+            val link = Jsoup.connect(detailsLink)
+                .get().html().substringAfter("file:\"").substringBefore("m3u8") + "m3u8"
 
-            val formBody = FormBody.Builder()
-                .add("id", id)
-                .build()
-            val request: Request = Request.Builder()
-                .url("https://api.animevost.org/v1/playlist")
-                .post(formBody)
-                .build()
+            Log.i("", link)
 
-            try {
-                val response = client.newCall(request).execute()
-
-                val playlist =
-                    Gson().fromJson(response.body?.string(), Array<PlaylistModel>::class.java)
-
-                (this@loadPlayList as AppCompatActivity).runOnUiThread {
-                    onPlaylistReady(
-                        playlist.toList().sortedBy { it.name.substringBefore(" ").toInt() })
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
+            (this@loadFile as AppCompatActivity).runOnUiThread {
+                dataReadyListener(link)
             }
         }
 
