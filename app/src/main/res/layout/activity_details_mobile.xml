@@ -36,13 +36,13 @@
                 app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:textColor="#fff"
                 android:id="@+id/animeTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:ellipsize="end"
                 android:maxLines="2"
+                android:textColor="#fff"
                 android:textSize="20sp"
                 app:layout_constraintBottom_toBottomOf="@+id/back"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -72,11 +72,11 @@
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/info"
-                    android:textColor="#fff"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:ellipsize="end"
+                    android:textColor="#fff"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/preview"
@@ -89,24 +89,13 @@
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/details"
                 android:layout_width="0dp"
-                android:textColor="#5d616d"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/info_layout"
+                android:textColor="#5d616d"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/info_layout"
                 tools:maxLines="10"
                 tools:text="@tools:sample/lorem/random" />
-
-            <ProgressBar
-                android:id="@+id/progress_bar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/info_layout"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/info_layout"
-                app:layout_constraintTop_toTopOf="@id/info_layout" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -123,5 +112,17 @@
             app:layout_constraintTop_toBottomOf="@id/content_layout"
             tools:layout_height="140dp"
             tools:listitem="@layout/playlist_title_preview" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
