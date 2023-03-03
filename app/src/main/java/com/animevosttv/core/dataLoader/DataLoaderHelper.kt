@@ -2,9 +2,11 @@ package com.animevosttv.core.dataLoader
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.animevosttv.core.model.*
+import com.animevosttv.core.model.DetailsTitleModel
+import com.animevosttv.core.model.EpisodeModel
+import com.animevosttv.core.model.PreviewTitleModel
+import com.animevosttv.core.model.SeasonModel
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
@@ -16,6 +18,7 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
+const val BASE_URL = "https://cikava-ideya.top"
 
 fun Context.loadOngoings(
     page: Int,
@@ -25,7 +28,7 @@ fun Context.loadOngoings(
     val downloadThread: Thread = object : Thread() {
         override fun run() {
             val doc = try {
-                Jsoup.connect("https://cikava-ideya.top/${base}/page/${page}/").get()
+                Jsoup.connect("$BASE_URL/${base}/page/${page}/").get()
                     .getElementById("dle-content")
             } catch (e: java.lang.Exception) {
                 null
@@ -43,13 +46,12 @@ fun Context.loadOngoings(
 
 fun Context.searchTitles(
     search: String?,
-    page: Int,
     dataReadyListener: (MutableList<PreviewTitleModel>) -> Unit
 ) {
     val downloadThread: Thread = object : Thread() {
         override fun run() {
             val doc =
-                Jsoup.connect("https://cikava-ideya.top/index.php?do=search&subaction=search&search_start=0&full_search=0&result_from=1&story=$search")
+                Jsoup.connect("$BASE_URL/index.php?do=search&subaction=search&search_start=0&full_search=0&result_from=1&story=$search")
                     .get()
                     .getElementById("dle-content")
 
@@ -73,7 +75,7 @@ private fun parseData(doc: Element?): MutableList<PreviewTitleModel> {
                 PreviewTitleModel(
                     title = item.getElementsByClass("th-title nowrap").firstOrNull()?.text() ?: "",
                     link = item.getElementsByClass("th-in").firstOrNull()?.attr("href") ?: "",
-                    image = "https://cikava-ideya.top/" + item.getElementsByClass("th-img")
+                    image = "$BASE_URL/" + item.getElementsByClass("th-img")
                         .firstOrNull()?.getElementsByClass("anim")?.firstOrNull()?.attr("src"),
                 )
             )
@@ -108,7 +110,7 @@ fun Context.loadDetails(detailsLink: String, dataReadyListener: (DetailsTitleMod
                     title = doc.getElementsByClass("fright fx-1").select("h1").firstOrNull()?.text()
                         ?: ""
                     image =
-                        "https://cikava-ideya.top/" + doc.getElementsByClass("fposter img-box img-fit")
+                        "$BASE_URL/" + doc.getElementsByClass("fposter img-box img-fit")
                             .firstOrNull()?.getElementsByClass("anim")?.firstOrNull()?.attr("src")
                     description = doc.getElementsByClass("fdesc clr full-text clearfix").html()
                     additionalInfo =
@@ -128,10 +130,10 @@ fun Context.loadDetails(detailsLink: String, dataReadyListener: (DetailsTitleMod
                                 SeasonModel(
                                     "0", listOf(
                                         EpisodeModel(
-                                            "Фільм", playlist.asString, "", "${
-                                                detailsLink.substringAfter("top/")
-                                                    .substringBefore("-")
-                                            }"
+                                            "Фільм",
+                                            playlist.asString,
+                                            "",
+                                            detailsLink.substringAfter("top/").substringBefore("-")
                                         )
                                     )
                                 )

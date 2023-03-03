@@ -31,7 +31,7 @@
             android:name=".view.details.DetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".view.ongoings.OngoingsActivity"
+            android:name=".view.main.MainActivity"
             android:exported="false" />
         <activity
             android:name=".view.splash.SplashActivity"

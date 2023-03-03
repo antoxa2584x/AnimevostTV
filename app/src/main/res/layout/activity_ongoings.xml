@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#131722"
-        tools:context=".view.ongoings.OngoingsActivity">
+        tools:context=".view.main.MainActivity">
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/search_badge"
@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="24dp"
             android:backgroundTint="#EC5354"
-            android:contentDescription="Пошук"
+            android:contentDescription="@string/search_title"
             android:nextFocusLeft="@id/content"
             android:src="@drawable/lb_ic_in_app_search"
             android:visibility="gone"
@@ -30,7 +30,7 @@
             android:id="@+id/fragment_container_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:name="com.animevosttv.view.details.OngoingFragment" />
+            android:name="com.animevosttv.view.main.fragment.SerialFragment" />
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"

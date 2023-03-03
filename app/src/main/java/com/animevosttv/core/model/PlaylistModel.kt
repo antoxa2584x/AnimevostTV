@@ -1,8 +1,8 @@
 package com.animevosttv.core.model
 
 
-import com.google.gson.annotations.SerializedName
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
@@ -15,6 +15,6 @@ data class PlaylistModel(
     val preview: String,
     @SerializedName("std")
     val std: String
-) : Parcelable{
-    fun getHttpsPreview() = preview.replace("http","https")
+) : Parcelable {
+    fun getHttpsPreview() = preview.replace("http", "https")
 }

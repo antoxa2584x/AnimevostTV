@@ -21,5 +21,5 @@ class EpisodeModel(
     var episode: String,
     var link: String,
     var preview: String,
-    var id:String?,
+    var id: String?,
 ) : Parcelable

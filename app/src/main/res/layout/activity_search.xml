@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.ongoings.OngoingsActivity">
+    tools:context=".view.main.MainActivity">
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/search"
@@ -18,9 +18,9 @@
         android:focusedByDefault="true"
         android:nextFocusDown="@id/content"
         android:theme="@style/ThemeOverlay.SearchView"
-        app:defaultQueryHint="Поиск"
+        app:defaultQueryHint="@string/search_title"
         app:layout_constraintTop_toTopOf="parent"
-        app:queryHint="Поиск"
+        app:queryHint="@string/search_title"
         app:searchHintIcon="@drawable/ic_baseline_search_24"
         app:searchIcon="@drawable/ic_baseline_search_24" />
 

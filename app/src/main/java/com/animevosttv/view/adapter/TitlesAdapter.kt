@@ -1,12 +1,11 @@
 package com.animevosttv.view.adapter
 
 import android.content.Context
-import com.animevosttv.core.model.PreviewTitleModel
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.animevosttv.R
-import com.animevosttv.view.details.OngoingFragment
+import com.animevosttv.core.model.PreviewTitleModel
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.default_title_item.view.*
 
@@ -93,12 +92,5 @@ class TitlesAdapter internal constructor(
             }
         }
 
-        override fun onFocus() {
-            super.onFocus()
-        }
-
-        override fun onUnFocus() {
-            super.onUnFocus()
-        }
     }
 }

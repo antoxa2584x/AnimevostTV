@@ -9,7 +9,7 @@ open class PreviewTitleModel(
     var image: String? = "",
     var description: String? = "",
     var link: String? = "",
-):Parcelable{
+) : Parcelable {
 
-    fun getId() = link?.substringAfterLast("/")?.substringBefore("-")?:""
+    fun getId() = link?.substringAfterLast("/")?.substringBefore("-") ?: ""
 }

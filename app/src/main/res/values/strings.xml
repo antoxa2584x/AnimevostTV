@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Цікава Ідея</string>
+    <string name="menu_serials">Серіали</string>
+    <string name="menu_films">Фільми</string>
+    <string name="menu_animation">Анімаційні</string>
+    <string name="toolbar_serials">Цікава Ідея: Серіали</string>
+    <string name="toolbar_films">Цікава Ідея: Фільми</string>
+    <string name="toolbar_animation">Цікава Ідея: Анімаційні</string>
+    <string name="search_title">Пошук</string>
+    <string name="splash_title">ЦікаваІдея</string>
+    <string name="file_not_found">Файл не знайдено</string>
+    <string name="mx_player_required">Для коректної роботи необхідно встановити MX Player</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.animevosttv.view.details
+package com.animevosttv.view.main.fragment
 
 import android.os.Bundle
 import android.view.View
@@ -11,17 +11,16 @@ import com.animevosttv.core.model.PreviewTitleModel
 import com.animevosttv.view.adapter.TitlesAdapter
 import com.animevosttv.view.adapter.listener.OnLoadMoreListener
 import com.animevosttv.view.adapter.listener.RecyclerViewLoadMoreScroll
-import kotlinx.android.synthetic.main.activity_ongoings.*
+import com.animevosttv.view.details.DetailsActivity
 import kotlinx.android.synthetic.main.onfoing_fragment_layout.*
-import kotlinx.android.synthetic.main.onfoing_fragment_layout.search_badge
 
-class OngoingFragment : Fragment(R.layout.onfoing_fragment_layout),
+class SerialFragment : Fragment(R.layout.onfoing_fragment_layout),
     TitlesAdapter.ItemClickListener {
 
     private lateinit var layoutManager: GridLayoutManager
     private lateinit var scrollListener: RecyclerViewLoadMoreScroll
     private lateinit var adapter: TitlesAdapter
-    private var spanCount = 0;
+    private var spanCount = 0
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,7 +57,7 @@ class OngoingFragment : Fragment(R.layout.onfoing_fragment_layout),
     }
 
     private fun loadData(page: Int) {
-        requireContext().loadOngoings(page,"serialy") {
+        requireContext().loadOngoings(page, "serialy") {
             hideLoading()
 
             adapter.addAll(it)

@@ -6,10 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.animevosttv.R
 import com.animevosttv.core.model.EpisodeModel
-import com.animevosttv.core.model.PlaylistModel
 import com.animevosttv.core.prefs.ApplicationPreferences
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.RequestOptions.bitmapTransform
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlinx.android.synthetic.main.playlist_title_preview.view.*

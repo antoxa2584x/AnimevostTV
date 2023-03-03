@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.text.Html
 import android.view.View
-import android.widget.RatingBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageView
@@ -49,7 +48,6 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
     private lateinit var titlePreview: AppCompatImageView
     private lateinit var infoTextView: AppCompatTextView
     private lateinit var aboutTextView: AppCompatTextView
-    private lateinit var ratingBar: RatingBar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,17 +78,6 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
 
             Glide.with(this).load(preview.image).into(titlePreview)
 
-//            loadPlayList(preview.getId()) {
-//                episodesList.adapter =
-//                    PlayListAdapter(this@DetailsActivity, it, preview.getId()).apply {
-//                        setClickListener(this@DetailsActivity)
-//                    }
-//
-//                lastWatched?.let {
-//                    if (it.episode > 1)
-//                        episodesList.layoutManager?.scrollToPosition(it.episode - 1)
-//                }
-//            }
             loadDetails(preview.link ?: "") { details ->
                 details?.let {
                     title.text = it.title
@@ -115,7 +102,12 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
 
                     episodesList.adapter =
                         it.playList?.firstOrNull()?.episodes?.let { season ->
-                            PlayListAdapter(this@DetailsActivity, season, preview.image, preview.getId()).apply {
+                            PlayListAdapter(
+                                this@DetailsActivity,
+                                season,
+                                preview.image,
+                                preview.getId()
+                            ).apply {
                                 setClickListener(this@DetailsActivity)
                             }
                         }
@@ -134,10 +126,10 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
             (episodesList.adapter as PlayListAdapter).notifyDataSetChanged()
         }
 
-        loadFile(previewTitleModel.link){
+        loadFile(previewTitleModel.link) {
 
-            if(it?.contains("Файл не найден") == true){
-                Toast.makeText(this, "Файл не знайдено", Toast.LENGTH_SHORT).show()
+            if (it?.contains("Файл не найден") == true) {
+                Toast.makeText(this, getString(R.string.file_not_found), Toast.LENGTH_SHORT).show()
                 return@loadFile
             }
 
@@ -151,11 +143,11 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
 
             try {
                 intent.setPackage("com.mxtech.videoplayer.pro")
-                startActivity(intent);
+                startActivity(intent)
             } catch (e: ActivityNotFoundException) {
                 try {
                     intent.setPackage("com.mxtech.videoplayer.ad")
-                    startActivity(intent);
+                    startActivity(intent)
                 } catch (e: ActivityNotFoundException) {
                     val goToMarket =
                         Intent(Intent.ACTION_VIEW).setData(Uri.parse("market://search?q='MX Player'"))
@@ -163,7 +155,7 @@ class DetailsActivity : AppCompatActivity(), PlayListAdapter.ItemClickListener {
 
                     Toast.makeText(
                         this,
-                        "Для корректной работы необходим MX Player",
+                        getString(R.string.mx_player_required),
                         Toast.LENGTH_SHORT
                     ).show()
                 }

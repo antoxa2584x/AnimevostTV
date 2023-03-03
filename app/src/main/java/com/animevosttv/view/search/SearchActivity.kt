@@ -18,14 +18,14 @@ class SearchActivity : AppCompatActivity(), TitlesAdapter.ItemClickListener {
 
     private lateinit var layoutManager: GridLayoutManager
     private lateinit var adapter: TitlesAdapter
-    private var spanCount = 0;
+    private var spanCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-        search.setIconifiedByDefault(false);
-        search.performClick();
-        search.requestFocus();
+        search.setIconifiedByDefault(false)
+        search.performClick()
+        search.requestFocus()
 
         spanCount = if (isGoogleTV()) 6 else 2
 
@@ -47,7 +47,7 @@ class SearchActivity : AppCompatActivity(), TitlesAdapter.ItemClickListener {
                 if (newText?.isNotEmpty() == true && newText.length >= 4) {
                     progress_bar_layout.visibility = View.VISIBLE
 
-                    searchTitles(newText, 0) {
+                    searchTitles(newText) {
                         adapter.clear()
                         adapter.addAll(it)
                         progress_bar_layout.visibility = View.GONE

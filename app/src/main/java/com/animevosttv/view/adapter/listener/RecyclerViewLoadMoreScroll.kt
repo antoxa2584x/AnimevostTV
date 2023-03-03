@@ -51,7 +51,7 @@ open class RecyclerViewLoadMoreScroll(layoutManager: GridLayoutManager) :
         }
 
         if (!isLoading && totalItemCount <= lastVisibleItem + visibleThreshold) {
-            page +=1
+            page += 1
             mOnLoadMoreListener.onLoadMore(page)
             isLoading = true
         }

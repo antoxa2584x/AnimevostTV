@@ -5,7 +5,7 @@ import com.chibatching.kotpref.Kotpref
 import com.chibatching.kotpref.gsonpref.gson
 import com.google.gson.GsonBuilder
 
-class AnimeVostApplication: Application() {
+class AnimeVostApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 

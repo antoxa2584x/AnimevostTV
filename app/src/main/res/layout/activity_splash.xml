@@ -14,7 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:textSize="34sp"
         android:textStyle="bold"
-        android:text="ЦікаваІдея"
+        android:text="@string/splash_title"
         android:gravity="center"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
