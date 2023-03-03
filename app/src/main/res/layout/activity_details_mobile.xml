@@ -68,6 +68,7 @@
                     app:layout_constraintDimensionRatio="H,3:2"
                     app:layout_constraintHeight="240dp"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:src="@tools:sample/avatars" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -77,6 +78,7 @@
                     android:layout_marginStart="16dp"
                     android:ellipsize="end"
                     android:textColor="#fff"
+                    android:textColorLink="?colorAccent"
                     android:textSize="12sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/preview"
@@ -90,6 +92,7 @@
                 android:id="@+id/details"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:textColor="#5d616d"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_marginBottom="24dp"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="24dp">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:layout_width="wrap_content"
-        android:textColor="#fff"
+        android:layout_height="wrap_content"
         android:text=""
-        android:textSize="32sp"
-        android:layout_height="wrap_content"/>
+        android:textColor="#fff"
+        android:textSize="32sp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
