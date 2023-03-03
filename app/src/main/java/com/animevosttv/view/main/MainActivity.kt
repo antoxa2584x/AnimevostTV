@@ -26,21 +26,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SearchActivity::class.java))
         }
 
-        toolbar.apply {
-            title = getString(R.string.toolbar_serials)
-
-            setNavigationOnClickListener {
-                slider.drawerLayout?.open()
-            }
-        }
-
-        setSupportActionBar(toolbar)
-
-        supportActionBar?.apply {
-            setDisplayHomeAsUpEnabled(true)
-            setHomeButtonEnabled(true)
-        }
-
         slider.apply {
             addItems(PrimaryDrawerItem().apply {
                 nameText = getString(R.string.menu_serials); isSelectable = true
@@ -76,5 +61,21 @@ class MainActivity : AppCompatActivity() {
                 false
             }
         }
+
+        toolbar.apply {
+            title = getString(R.string.toolbar_serials)
+        }
+
+        setSupportActionBar(toolbar)
+
+        toolbar.setNavigationOnClickListener {
+            slider.drawerLayout?.open()
+        }
+
+        supportActionBar?.apply {
+            setDisplayHomeAsUpEnabled(true)
+            setHomeButtonEnabled(true)
+        }
+
     }
 }

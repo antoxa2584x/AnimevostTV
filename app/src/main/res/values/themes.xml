@@ -4,6 +4,7 @@
         <item name="materialDrawerStyle">@style/Widget.MaterialDrawerStyle</item>
         <item name="materialDrawerHeaderStyle">@style/Widget.MaterialDrawerHeaderStyle</item>
         <item name="colorAccent">#EC5354</item>
+        <item name="colorPrimary">#131722</item>
         <item name="backgroundColor">#131722</item>
         <item name="android:windowBackground">#131722</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
