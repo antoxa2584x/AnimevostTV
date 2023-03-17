@@ -13,12 +13,25 @@ android {
         applicationId "com.tsikavaideya"
         minSdk 21
         targetSdk 33
-        versionCode 1
-        versionName "1.1"
+        versionCode 10
+        versionName "1.0"
 
     }
-
     buildTypes {
+        debug {
+            debuggable true
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    def code = variant.versionCode
+                    def versionName = variant.versionName
+                    outputFileName = "cikava_ideya_${versionName}_(${code}).apk"
+                }
+            }
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
